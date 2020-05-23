@@ -1,6 +1,6 @@
 {
   "name": "formal-react-forms",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The most sophisticated form state wrapper for React",
   "author": "bmullis",
   "license": "Apache-2.0",
