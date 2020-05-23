@@ -62,7 +62,7 @@ const Formal = ({
 
   React.useEffect(() => {
     if (isSubmitting && isValid) {
-      onSubmit(setIsSubmitting, formData);
+      onSubmit({ setIsSubmitting, setErrors }, formData);
     } else {
       setIsSubmitting(false);
     }
