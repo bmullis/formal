@@ -1,11 +1,25 @@
 import * as React from "react";
 
 interface FormProps {
-  initialValues: {};
-  validationSchema: any[];
+  initialValues: FormValue;
+  validationSchema: ValidationRecord[];
   isInitiallyValid?: boolean;
   children: any;
   onSubmit: Function;
+}
+
+interface FormValue {
+  [key: string]: string;
+}
+
+interface ValidationRecord {
+  field: string;
+  required: boolean;
+}
+
+interface ErrorRecord {
+  field: string;
+  message: string;
 }
 
 const Formal = ({
@@ -15,16 +29,16 @@ const Formal = ({
   children,
   onSubmit,
 }: FormProps) => {
-  const [formData, setFormData] = React.useState<{
-    [key: string]: string;
-  }>(initialValues);
-  const [shouldValidate, setShouldValidate] = React.useState(!isInitiallyValid);
-  const [isValid, setIsValid] = React.useState<boolean | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [errors, setErrors] = React.useState<any[]>([]);
+  const [formData, setFormData] = React.useState<FormValue>(initialValues);
+  const [shouldValidate, setShouldValidate] = React.useState<boolean>(
+    !isInitiallyValid
+  );
+  const [isValid, setIsValid] = React.useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  const [errors, setErrors] = React.useState<ErrorRecord[]>([]);
 
-  const validateForm = React.useCallback(() => {
-    let newErrors: any = [];
+  const validateForm = React.useCallback(async () => {
+    let newErrors: ErrorRecord[] = [];
 
     validationSchema.forEach((item: { required: boolean; field: string }) => {
       if (item.required && formData[item.field] === "") {
@@ -35,33 +49,31 @@ const Formal = ({
       }
     });
 
-    setErrors(newErrors);
-  }, [formData, validationSchema]);
+    await setErrors(newErrors);
+  }, [formData]);
 
   React.useEffect(() => {
-    if (formData && shouldValidate) {
-      validateForm();
-    }
-  }, [formData, validateForm, shouldValidate]);
-
-  React.useEffect(() => {
-    setIsValid(errors && !!errors.length ? false : true);
+    setIsValid(!errors.length ? true : false);
   }, [errors]);
 
   React.useEffect(() => {
+    validateForm();
+  }, [formData]);
+
+  React.useEffect(() => {
     if (isSubmitting && isValid) {
-      onSubmit(formData);
+      onSubmit(setIsSubmitting, formData);
     } else {
       setIsSubmitting(false);
     }
-  }, [isSubmitting, isValid, onSubmit, formData]);
+  }, [isSubmitting]);
 
   const handleFormSubmit = () => {
     setShouldValidate(true);
     setIsSubmitting(true);
   };
 
-  const onChangeValues = (newValue: {}) => {
+  const onChangeValues = (newValue: FormValue) => {
     setFormData({
       ...formData,
       ...newValue,
@@ -75,8 +87,8 @@ const Formal = ({
         onChangeValues,
         handleFormSubmit,
         isSubmitting,
-        isValid,
-        errors,
+        isValid: !isValid && shouldValidate ? false : true,
+        errors: !shouldValidate ? [] : errors,
       })}
     </form>
   );
