@@ -81,7 +81,12 @@ const Formal = ({
   };
 
   return (
-    <form>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        handleFormSubmit();
+      }}
+    >
       {children({
         values: formData,
         onChangeValues,
