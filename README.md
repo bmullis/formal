@@ -1,4 +1,4 @@
-# Formal
+# Formal 🤵🏼
 
 A very sophisticated form state manager for React. 🎩
 
