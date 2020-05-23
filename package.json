@@ -4,7 +4,7 @@
   "description": "The most sophisticated form state wrapper for React",
   "author": "bmullis",
   "license": "Apache-2.0",
-  "repository": "ovieokeh/npm-react-typescript-template",
+  "repository": "bmullis/formal-react-forms",
   "main": "dist/index.js",
   "engines": {
     "node": ">=8",
