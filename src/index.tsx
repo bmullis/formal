@@ -1,28 +1,43 @@
 import * as React from "react";
+import * as Yup from "yup";
 
 interface FormProps {
   initialValues: FormValue;
-  validationSchema: ValidationRecord[];
+  validationSchema: Yup.ObjectSchema;
   isInitiallyValid?: boolean;
-  children: any;
-  onSubmit: Function;
+  children: ({}: FormalProps) => React.ReactNode;
+  onSubmit: (actions: FormalActionsProps, formData: FormValue) => void;
 }
 
 interface FormValue {
   [key: string]: string;
 }
 
-interface ValidationRecord {
-  field: string;
-  required: boolean;
+export interface FormalActionsProps {
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+  setErrors: React.Dispatch<React.SetStateAction<Yup.ValidationError[]>>;
 }
 
-interface ErrorRecord {
-  field: string;
+export interface FormalProps {
+  values: FormValue;
+  onChangeValues: Function;
+  handleFormSubmit: Function;
+  isSubmitting: boolean;
+  isValid: boolean;
+  errors: Yup.ValidationError[];
+}
+
+export const generateError = ({
+  message,
+  path,
+}: {
   message: string;
-}
+  path: string;
+}) => {
+  return new Yup.ValidationError(message, null, path);
+};
 
-const Formal = ({
+export default ({
   initialValues,
   validationSchema,
   isInitiallyValid = true,
@@ -35,21 +50,17 @@ const Formal = ({
   );
   const [isValid, setIsValid] = React.useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
-  const [errors, setErrors] = React.useState<ErrorRecord[]>([]);
+  const [errors, setErrors] = React.useState<Yup.ValidationError[]>([]);
 
-  const validateForm = React.useCallback(async () => {
-    let newErrors: ErrorRecord[] = [];
-
-    validationSchema.forEach((item: { required: boolean; field: string }) => {
-      if (item.required && formData[item.field] === "") {
-        newErrors.push({
-          field: item.field,
-          message: "This field is required",
-        });
-      }
-    });
-
-    await setErrors(newErrors);
+  const validateForm = React.useCallback(() => {
+    validationSchema
+      .validate(formData, { abortEarly: false })
+      .then(() => {
+        setErrors([]);
+      })
+      .catch((error) => {
+        setErrors(error.inner);
+      });
   }, [formData]);
 
   React.useEffect(() => {
@@ -98,5 +109,3 @@ const Formal = ({
     </form>
   );
 };
-
-export default Formal;
