@@ -20,8 +20,8 @@ export interface FormalActionsProps {
 
 export interface FormalProps {
   values: FormValue;
-  onChangeValues: Function;
-  handleFormSubmit: Function;
+  onChangeValues: (newValue: any) => void;
+  handleFormSubmit: () => void;
   isSubmitting: boolean;
   isValid: boolean;
   errors: Yup.ValidationError[];
