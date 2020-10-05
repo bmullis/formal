@@ -68,11 +68,12 @@ const initialValues = {
 ```js
 const onSubmit = (actions: FormalActionsProps, values: InitialValuesProps) => {
   // Make Axios (or equivalent) call
-  // You have access to :
+  // You have access to:
+  values: {}
   // an object with the values from the form
-  values: actions: {
+  actions: {
     setIsSubmitting, // set state action to update isSubmitting state
-      setErrors; // set state action to update form errors
+    setErrors; // set state action to update form errors
   }
   // Examples:
   // actions.setErrors([newError]);
